@@ -1,0 +1,2 @@
+[env]
+DATABASE_URL = "postgresql://admin:admin@localhost:5433/gps"
