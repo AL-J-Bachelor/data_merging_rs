@@ -1,13 +1,13 @@
+use sqlx;
 
-
-
-
-
+#[derive(sqlx::FromRow)]
 struct PropertyPhysicalType {
     uuid: String,
     name: String,
     unit: Vec<String>,
 }
+
+#[derive(sqlx::FromRow)]
 struct PropertyDefinition {
     uuid: String,
     name: String,
@@ -15,6 +15,8 @@ struct PropertyDefinition {
     xml_name: Option<String>,
     is_array: bool,
 }
+
+#[derive(sqlx::FromRow)]
 struct GenomeProperty {
     uuid: String,
     property_definition_uuid: String,
@@ -23,6 +25,8 @@ struct GenomeProperty {
     _type: String,
     string_values: Vec<String>,
 }
+
+#[derive(sqlx::FromRow)]
 struct Genome {
     uuid: String,
     gxbd_id: Option<String>,
@@ -36,14 +40,20 @@ struct Genome {
     is_real: Option<bool>,
     real_genome_uuid: Option<String>,
 }
+
+#[derive(sqlx::FromRow)]
 struct Manufacturer {
     uuid: String,
     name: String,
 }
+
+#[derive(sqlx::FromRow)]
 struct GenomeType {
     uuid: String,
     name: String,
 }
+
+#[derive(sqlx::FromRow)]
 struct GenomeTypePropertyDefinition {
     genome_type_uuid: String,
     property_definition_uuid: String,

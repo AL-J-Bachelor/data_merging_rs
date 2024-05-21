@@ -1,0 +1,6 @@
+[ddf.env]
+DATABASE_URL = "postgresql://admin:admin@localhost:5432/ddf"
+[gps.env]
+DATABASE_URL = "postgresql://admin:admin@localhost:5433/gps"
+[pim.env]
+DATABASE_URL = "postgresql://admin:admin@localhost:5434/pim"

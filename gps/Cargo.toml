@@ -6,4 +6,5 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-sqlx = { version = "0.7", features = ["postgres"] }
+sqlx = { version = "0.7", features = ["postgres", "runtime-tokio"] }
+color-eyre = "~0.6"
