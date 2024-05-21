@@ -393,6 +393,9 @@ name = "data_merging_rs"
 version = "0.1.0"
 dependencies = [
  "color-eyre",
+ "ddf",
+ "gps",
+ "pim",
  "tokio",
 ]
 
@@ -685,6 +688,7 @@ version = "0.1.0"
 dependencies = [
  "color-eyre",
  "sqlx",
+ "tokio",
 ]
 
 [[package]]
@@ -1249,6 +1253,7 @@ version = "0.1.0"
 dependencies = [
  "color-eyre",
  "sqlx",
+ "tokio",
 ]
 
 [[package]]

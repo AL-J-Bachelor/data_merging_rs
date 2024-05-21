@@ -8,3 +8,7 @@ edition = "2021"
 [dependencies]
 sqlx = { version = "0.7", features = ["postgres", "runtime-tokio"] }
 color-eyre = "~0.6"
+tokio = "1.37.0"
+
+[lib]
+path = "src/models.rs"
