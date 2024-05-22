@@ -687,6 +687,9 @@ name = "gps"
 version = "0.1.0"
 dependencies = [
  "color-eyre",
+ "poem",
+ "poem-openapi",
+ "serde",
  "sqlx",
  "tokio",
 ]
@@ -1252,6 +1255,9 @@ name = "pim"
 version = "0.1.0"
 dependencies = [
  "color-eyre",
+ "poem",
+ "poem-openapi",
+ "serde",
  "sqlx",
  "tokio",
 ]

@@ -29,16 +29,21 @@ impl Api {
         )
             .fetch_all(pool)
             .await?;
+
         Ok(Json(ddfs))
     }
 
-    pub async fn insert_ddf(pool: &PgPool, ddf: NewDDF) {
+    /// Insert a new DDF
+    #[oai(path = "/ddfs", method = "put")]
+    pub async fn insert_ddf(&self, pool: &PgPool, ddf: Json<NewDDF>) -> Result<Json<DDF>> {
         let uuid = Uuid::parse_str(&ddf.dce_serial).unwrap();
-        sqlx::query!(
+        let inserted_ddf = sqlx::query_as!(
+            DDF,
             r#"
                 INSERT INTO ddfs (device_type, sku_number, manufacturer, model, dce_serial)
                 VALUES
                     ($1, $2, $3, $4, $5)
+                RETURNING id, device_type, sku_number, manufacturer, model, dce_serial
             "#,
             ddf.device_type,
             ddf.sku_number,
@@ -47,7 +52,8 @@ impl Api {
             uuid
         )
             .execute(pool)
-            .await
-            .unwrap();
+            .await?;
+
+        Ok(Json(inserted_ddf))
     }
 }
