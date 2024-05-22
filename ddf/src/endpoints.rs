@@ -1,6 +1,8 @@
+use poem::error::InternalServerError;
 use poem_openapi::OpenApi;
 use crate::models::*;
 use poem::Result;
+use poem::web::Data;
 use poem_openapi::payload::Json;
 use sqlx::PgPool;
 use sqlx::types::Uuid;
@@ -12,7 +14,7 @@ impl Api {
 
     /// Get all DDFs that match a given NewDDF
     #[oai(path = "/matching_ddfs", method = "get")]
-    pub async fn get_matching_ddfs(&self, pool: &PgPool, ddf: Json<NewDDF>) -> Result<Json<Vec<DDF>>> {
+    pub async fn get_matching_ddfs(&self, pool: Data<&PgPool>, ddf: Json<NewDDF>) -> Result<Json<Vec<DDF>>> {
         let uuid = Uuid::parse_str(&ddf.dce_serial).unwrap();
         let ddfs = sqlx::query_as!(
             DDF,
@@ -27,15 +29,16 @@ impl Api {
             ddf.manufacturer,
             uuid
         )
-            .fetch_all(pool)
-            .await?;
+            .fetch_all(pool.0)
+            .await
+            .map_err(|e| InternalServerError(e))?;
 
         Ok(Json(ddfs))
     }
 
     /// Insert a new DDF
     #[oai(path = "/ddfs", method = "put")]
-    pub async fn insert_ddf(&self, pool: &PgPool, ddf: Json<NewDDF>) -> Result<Json<DDF>> {
+    pub async fn insert_ddf(&self, pool: Data<&PgPool>, ddf: Json<NewDDF>) -> Result<Json<DDF>> {
         let uuid = Uuid::parse_str(&ddf.dce_serial).unwrap();
         let inserted_ddf = sqlx::query_as!(
             DDF,
@@ -51,8 +54,9 @@ impl Api {
             ddf.model,
             uuid
         )
-            .execute(pool)
-            .await?;
+            .fetch_one(pool.0)
+            .await
+            .map_err(|e| InternalServerError(e))?;
 
         Ok(Json(inserted_ddf))
     }
