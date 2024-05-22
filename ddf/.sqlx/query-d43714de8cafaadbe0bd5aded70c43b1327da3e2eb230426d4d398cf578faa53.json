@@ -1,0 +1,54 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                SELECT id, device_type, sku_number, manufacturer, model, dce_serial FROM ddfs\n                WHERE\n                    device_type = $1 AND\n                    manufacturer = $2 AND\n                    dce_serial = $3\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 1,
+        "name": "device_type",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "sku_number",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "manufacturer",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "model",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "dce_serial",
+        "type_info": "Uuid"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      false,
+      true,
+      false
+    ]
+  },
+  "hash": "d43714de8cafaadbe0bd5aded70c43b1327da3e2eb230426d4d398cf578faa53"
+}

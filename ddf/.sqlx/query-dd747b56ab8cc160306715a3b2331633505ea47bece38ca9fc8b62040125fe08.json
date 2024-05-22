@@ -1,0 +1,56 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                INSERT INTO ddfs (device_type, sku_number, manufacturer, model, dce_serial)\n                VALUES\n                    ($1, $2, $3, $4, $5)\n                RETURNING id, device_type, sku_number, manufacturer, model, dce_serial\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 1,
+        "name": "device_type",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "sku_number",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "manufacturer",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "model",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "dce_serial",
+        "type_info": "Uuid"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      false,
+      true,
+      false
+    ]
+  },
+  "hash": "dd747b56ab8cc160306715a3b2331633505ea47bece38ca9fc8b62040125fe08"
+}
