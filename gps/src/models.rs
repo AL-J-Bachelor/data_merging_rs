@@ -1,13 +1,17 @@
+use serde::{Deserialize, Serialize};
+use poem_openapi::Object;
 use sqlx;
 
-#[derive(sqlx::FromRow)]
+#[derive(Object)]
+#[derive(Serialize, Deserialize)]
 struct PropertyPhysicalType {
     uuid: String,
     name: String,
     unit: Vec<String>,
 }
 
-#[derive(sqlx::FromRow)]
+#[derive(Object)]
+#[derive(Serialize, Deserialize)]
 struct PropertyDefinition {
     uuid: String,
     name: String,
@@ -16,7 +20,8 @@ struct PropertyDefinition {
     is_array: bool,
 }
 
-#[derive(sqlx::FromRow)]
+#[derive(Object)]
+#[derive(Serialize, Deserialize)]
 struct GenomeProperty {
     uuid: String,
     property_definition_uuid: String,
@@ -26,7 +31,8 @@ struct GenomeProperty {
     string_values: Vec<String>,
 }
 
-#[derive(sqlx::FromRow)]
+#[derive(Object)]
+#[derive(Serialize, Deserialize)]
 struct Genome {
     uuid: String,
     gxbd_id: Option<String>,
@@ -41,19 +47,22 @@ struct Genome {
     real_genome_uuid: Option<String>,
 }
 
-#[derive(sqlx::FromRow)]
+#[derive(Object)]
+#[derive(Serialize, Deserialize)]
 struct Manufacturer {
     uuid: String,
     name: String,
 }
 
-#[derive(sqlx::FromRow)]
+#[derive(Object)]
+#[derive(Serialize, Deserialize)]
 struct GenomeType {
     uuid: String,
     name: String,
 }
 
-#[derive(sqlx::FromRow)]
+#[derive(Object)]
+#[derive(Serialize, Deserialize)]
 struct GenomeTypePropertyDefinition {
     genome_type_uuid: String,
     property_definition_uuid: String,

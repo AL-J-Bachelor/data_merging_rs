@@ -11,7 +11,6 @@ pub struct Api;
 
 #[OpenApi]
 impl Api {
-
     /// Get all DDFs that match a given NewDDF
     #[oai(path = "/matching_ddfs", method = "get")]
     pub async fn get_matching_ddfs(&self, pool: Data<&PgPool>, ddf: Json<NewDDF>) -> Result<Json<Vec<DDF>>> {
