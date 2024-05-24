@@ -4,7 +4,6 @@ use poem::Result;
 use poem_openapi::OpenApi;
 use poem_openapi::payload::Json;
 use sqlx::PgPool;
-use sqlx::types::Uuid;
 use crate::models::Product;
 
 pub struct Api;
