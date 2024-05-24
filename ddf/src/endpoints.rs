@@ -1,4 +1,4 @@
-use poem::error::InternalServerError;
+use poem::error::{BadRequest, InternalServerError};
 use poem_openapi::OpenApi;
 use crate::models::*;
 use poem::Result;
@@ -14,7 +14,7 @@ impl Api {
     /// Get all DDFs that match a given NewDDF
     #[oai(path = "/matching_ddfs", method = "get")]
     pub async fn get_matching_ddfs(&self, pool: Data<&PgPool>, ddf: Json<NewDDF>) -> Result<Json<Vec<DDF>>> {
-        let uuid = Uuid::parse_str(&ddf.dce_serial).unwrap();
+        let uuid = Uuid::parse_str(&ddf.dce_serial).map_err(BadRequest)?;
         let ddfs = sqlx::query_as!(
             DDF,
             r#"
@@ -36,9 +36,9 @@ impl Api {
     }
 
     /// Insert a new DDF
-    #[oai(path = "/ddfs", method = "put")]
+    #[oai(path = "/ddfs", method = "post")]
     pub async fn insert_ddf(&self, pool: Data<&PgPool>, ddf: Json<NewDDF>) -> Result<Json<DDF>> {
-        let uuid = Uuid::parse_str(&ddf.dce_serial).unwrap();
+        let uuid = Uuid::parse_str(&ddf.dce_serial).map_err(BadRequest);
         let inserted_ddf = sqlx::query_as!(
             DDF,
             r#"
