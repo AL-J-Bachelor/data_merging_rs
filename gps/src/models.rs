@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 use poem_openapi::Object;
-use sqlx;
+use sqlx::FromRow;
 
 #[derive(Object)]
 #[derive(Serialize, Deserialize)]
@@ -22,6 +22,7 @@ struct PropertyDefinition {
 
 #[derive(Object)]
 #[derive(Serialize, Deserialize)]
+#[derive(FromRow)]
 struct GenomeProperty {
     uuid: String,
     property_definition_uuid: String,
