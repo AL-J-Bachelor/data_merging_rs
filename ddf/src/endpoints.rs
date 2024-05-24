@@ -38,7 +38,7 @@ impl Api {
     /// Insert a new DDF
     #[oai(path = "/ddfs", method = "post")]
     pub async fn insert_ddf(&self, pool: Data<&PgPool>, ddf: Json<NewDDF>) -> Result<Json<DDF>> {
-        let uuid = Uuid::parse_str(&ddf.dce_serial).map_err(BadRequest);
+        let uuid = Uuid::parse_str(&ddf.dce_serial).map_err(BadRequest)?;
         let inserted_ddf = sqlx::query_as!(
             DDF,
             r#"
