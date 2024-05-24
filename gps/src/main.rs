@@ -18,7 +18,7 @@ async fn main() -> Result<()> {
     let url = env::var("HOST_URL")?;
 
     let api_service =
-        OpenApiService::new(Api, "DDF Service", env!("CARGO_PKG_VERSION"))
+        OpenApiService::new(Api, "GPS Service", env!("CARGO_PKG_VERSION"))
             .server(env::var("DOCUMENTATION_TARGET_URL")?);
     let openapi = api_service.openapi_explorer();
     let swagger = api_service.swagger_ui();
