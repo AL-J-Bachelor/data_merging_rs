@@ -8,12 +8,13 @@ use reqwest;
 async fn main() -> Result<()> {
     color_eyre::install()?;
 
-    println!("Hello, world!");
     let products_url = "http://localhost:7300/products";
     let products = reqwest::get(products_url)
         .await?
         .json::<Vec<Product>>()
         .await?;
+
+    println!("Retrieved products: {}", products.len());
 
 
     // let new_ddfs = products.map(NewDDF::from).collect();
