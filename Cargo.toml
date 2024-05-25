@@ -1,4 +1,4 @@
-workspace = { members = ["ddf", "gps", "pim"] }
+workspace = { members = ["ddf", "gps", "models", "pim"] }
 [package]
 name = "data_merging_rs"
 version = "0.1.0"
@@ -9,6 +9,5 @@ edition = "2021"
 [dependencies]
 tokio = { version = "~1.37", features = ["rt", "rt-multi-thread", "macros"] }
 color-eyre = "~0.6"
-ddf = { path = "ddf"}
-gps = { path = "gps"}
-pim = { path = "pim"}
+models = { path = "models" }
+reqwest = { version = "~0.12", features = ["json"] }

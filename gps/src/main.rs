@@ -1,4 +1,3 @@
-mod models;
 mod endpoints;
 
 use poem::{EndpointExt, listener::TcpListener, Route, Server};

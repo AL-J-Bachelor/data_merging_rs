@@ -1,17 +1,21 @@
-use pim;
-use pim::Product;
-use gps;
-use ddf;
-use ddf::NewDDF;
+use models::ddf::*;
+use models::gps::*;
+use models::pim::*;
 use color_eyre::Result;
+use reqwest;
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    println!("Hello, world!");
+    color_eyre::install()?;
 
-    // let pim_conn: pim::get_pool().await?;
-    // let products: Vec<Product> = pim::get_all_products(pim_conn).await?;
-    //
+    println!("Hello, world!");
+    let products_url = "http://localhost:7300/products";
+    let products = reqwest::get(products_url)
+        .await?
+        .json::<Vec<Product>>()
+        .await?;
+
+
     // let new_ddfs = products.map(NewDDF::from).collect();
     //
     // let ddf_conn = ddf::get_pool().await?;
