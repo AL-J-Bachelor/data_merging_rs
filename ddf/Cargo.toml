@@ -13,4 +13,5 @@ poem = "~3.0"
 poem-openapi = { version = "~5.0", features = ["swagger-ui", "openapi-explorer"] }
 serde = { version = "~1.0", features = ["derive"] }
 serde_json = "~1.0"
+futures = "~0.3"
 models = { path = "../models" }

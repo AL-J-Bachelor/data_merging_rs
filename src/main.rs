@@ -8,19 +8,24 @@ use reqwest;
 async fn main() -> Result<()> {
     color_eyre::install()?;
 
+    let client = reqwest::Client::new();
+
+
+
     let products_url = "http://localhost:7300/products";
-    let products = reqwest::get(products_url)
+    let products = client.get(products_url)
         .await?
         .json::<Vec<Product>>()
         .await?;
 
     println!("Retrieved products: {}", products.len());
 
+    let new_ddfs: Vec<NewDDF> = products.map(NewDDF::from).collect();
 
-    // let new_ddfs = products.map(NewDDF::from).collect();
-    //
-    // let ddf_conn = ddf::get_pool().await?;
-    // let matching_ddfs = ddf::get_matching_ddfs(&ddf_conn, new_ddfs).await?;
+    client.post("http://localhost:7100/ddfs/bulk")
+        .json(new_ddfs)
+        .send()
+        .await?;
 
     Ok(())
 }
