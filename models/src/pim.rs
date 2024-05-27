@@ -5,6 +5,7 @@ pub type Millimeters = f64;
 
 #[derive(Object)]
 #[derive(Serialize, Deserialize)]
+#[derive(Clone)]
 pub struct Product {
     pub id: i32,
     pub sku_number: String,
