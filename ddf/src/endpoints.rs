@@ -7,7 +7,6 @@ use poem_openapi::payload::{Json, PlainText};
 use sqlx::PgPool;
 use sqlx::types::Uuid;
 use futures::future::join_all;
-use futures::StreamExt;
 
 pub struct Api;
 
@@ -40,13 +39,34 @@ impl Api {
     /// Insert a new DDF
     #[oai(path = "/ddfs", method = "post")]
     pub async fn insert_ddf(&self, pool: Data<&PgPool>, ddf: Json<NewDDF>) -> Result<Json<DDF>> {
-        let uuid = Uuid::parse_str(&ddf.dce_serial).map_err(BadRequest)?;
+        let inserted_ddf = self.insert_return_ddf(pool.0, &ddf.0)
+            .await
+            .unwrap();
+
+        Ok(Json(inserted_ddf))
+    }
+
+    /// Insert a new DDF
+    #[oai(path = "/ddfs/bulk", method = "post")]
+    pub async fn insert_ddfs(&self, pool: Data<&PgPool>, ddfs: Json<Vec<NewDDF>>) -> Result<PlainText<String>> {
+        let created_ddfs = join_all(
+            ddfs.iter().map(|ddf| self.insert_return_ddf(pool.0, ddf))
+        )
+            .await;
+        let created_count = created_ddfs.iter()
+            .filter(|ddf| ddf.is_ok())
+            .count();
+
+        Ok(PlainText(created_count.to_string()))
+    }
+
+    async fn insert_return_ddf(&self, pool: &PgPool, ddf: &NewDDF) -> color_eyre::Result<DDF> {
+        let uuid = Uuid::parse_str(ddf.dce_serial.as_str())?;
         let inserted_ddf = sqlx::query_as!(
             DDF,
             r#"
                 INSERT INTO ddfs (device_type, sku_number, manufacturer, model, dce_serial)
-                VALUES
-                    ($1, $2, $3, $4, $5)
+                VALUES ($1, $2, $3, $4, $5)
                 RETURNING id, device_type, sku_number, manufacturer, model, dce_serial
             "#,
             ddf.device_type,
@@ -55,41 +75,8 @@ impl Api {
             ddf.model,
             uuid
         )
-            .fetch_one(pool.0)
-            .await
-            .map_err(|e| InternalServerError(e))?;
-
-        Ok(Json(inserted_ddf))
-    }
-
-    /// Insert a new DDF
-    #[oai(path = "/ddfs/bulk", method = "post")]
-    pub async fn insert_ddfs(&self, pool: Data<&PgPool>, ddfs: Json<Vec<NewDDF>>) -> Result<PlainText<DDF>> {
-        let created_ddfs: Vec<Option<DDF>> = join_all(ddfs.iter().map(async move |ddf| {
-            let uuid = Uuid::parse_str(&ddf.dce_serial).map_err(BadRequest)?;
-            let inserted_ddf = sqlx::query_as!(
-                DDF,
-                r#"
-                    INSERT INTO ddfs (device_type, sku_number, manufacturer, model, dce_serial)
-                    VALUES
-                        ($1, $2, $3, $4, $5)
-                    RETURNING id, device_type, sku_number, manufacturer, model, dce_serial
-                "#,
-                ddf.device_type,
-                ddf.sku_number,
-                ddf.manufacturer,
-                ddf.model,
-                uuid
-            )
-                .fetch_one(pool.0)
-                .await;
-            inserted_ddf.ok()
-        }))
-            .await;
-        let created_count = created_ddfs.iter()
-            .filter(Option::is_some)
-            .count();
-
-        Ok(PlainText(created_count))
+            .fetch_one(pool)
+            .await?;
+        Ok(inserted_ddf)
     }
 }
