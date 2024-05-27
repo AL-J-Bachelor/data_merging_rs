@@ -12,7 +12,7 @@ pub struct Api;
 #[OpenApi]
 impl Api {
     /// Get all DDFs that match a given NewDDF
-    #[oai(path = "/matching_ddfs", method = "get")]
+    #[oai(path = "/ddfs/matching", method = "get")]
     pub async fn get_matching_ddfs(&self, pool: Data<&PgPool>, ddf: Json<NewDDF>) -> Result<Json<Vec<DDF>>> {
         let ddfs = sqlx::query_as!(
             DDF,
@@ -26,6 +26,22 @@ impl Api {
             ddf.device_type,
             ddf.manufacturer,
             ddf.dce_serial,
+        )
+            .fetch_all(pool.0)
+            .await
+            .map_err(|e| InternalServerError(e))?;
+
+        Ok(Json(ddfs))
+    }
+
+    /// Get all DDFs
+    #[oai(path = "/ddfs", method = "get")]
+    pub async fn get_all_ddfs(&self, pool: Data<&PgPool>) -> Result<Json<Vec<DDF>>> {
+        let ddfs = sqlx::query_as!(
+            DDF,
+            r#"
+                SELECT id, device_type, sku_number, manufacturer, model, dce_serial FROM ddfs
+            "#
         )
             .fetch_all(pool.0)
             .await
