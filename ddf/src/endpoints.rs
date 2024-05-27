@@ -1,11 +1,10 @@
-use poem::error::{BadRequest, InternalServerError};
+use poem::error::InternalServerError;
 use poem_openapi::OpenApi;
 use models::ddf::*;
 use poem::Result;
 use poem::web::Data;
 use poem_openapi::payload::{Json, PlainText};
 use sqlx::PgPool;
-use sqlx::types::Uuid;
 use futures::future::join_all;
 
 pub struct Api;
@@ -15,7 +14,6 @@ impl Api {
     /// Get all DDFs that match a given NewDDF
     #[oai(path = "/matching_ddfs", method = "get")]
     pub async fn get_matching_ddfs(&self, pool: Data<&PgPool>, ddf: Json<NewDDF>) -> Result<Json<Vec<DDF>>> {
-        let uuid = Uuid::parse_str(&ddf.dce_serial).map_err(BadRequest)?;
         let ddfs = sqlx::query_as!(
             DDF,
             r#"
@@ -27,7 +25,7 @@ impl Api {
             "#,
             ddf.device_type,
             ddf.manufacturer,
-            uuid
+            ddf.dce_serial,
         )
             .fetch_all(pool.0)
             .await
@@ -53,6 +51,7 @@ impl Api {
             ddfs.iter().map(|ddf| self.insert_return_ddf(pool.0, ddf))
         )
             .await;
+
         let created_count = created_ddfs.iter()
             .filter(|ddf| ddf.is_ok())
             .count();
@@ -61,7 +60,6 @@ impl Api {
     }
 
     async fn insert_return_ddf(&self, pool: &PgPool, ddf: &NewDDF) -> color_eyre::Result<DDF> {
-        let uuid = Uuid::parse_str(ddf.dce_serial.as_str())?;
         let inserted_ddf = sqlx::query_as!(
             DDF,
             r#"
@@ -73,7 +71,7 @@ impl Api {
             ddf.sku_number,
             ddf.manufacturer,
             ddf.model,
-            uuid
+            ddf.dce_serial,
         )
             .fetch_one(pool)
             .await?;
