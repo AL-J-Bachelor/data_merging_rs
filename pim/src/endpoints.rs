@@ -16,7 +16,7 @@ impl Api {
         let products = sqlx::query_as!(
             Product,
             r#"
-                SELECT id FROM products
+                SELECT id, sku_number, device_type, manufacturer, model, dce_serial_number, width, height, depth FROM products
             "#
         )
             .fetch_all(pool.0)
