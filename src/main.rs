@@ -14,13 +14,14 @@ async fn main() -> Result<()> {
 
     let products_url = "http://localhost:7300/products";
     let products = client.get(products_url)
+        .send()
         .await?
         .json::<Vec<Product>>()
         .await?;
 
     println!("Retrieved products: {}", products.len());
 
-    let new_ddfs: Vec<NewDDF> = products.map(NewDDF::from).collect();
+    let new_ddfs: Vec<NewDDF> = products.iter().map(NewDDF::from).collect();
 
     client.post("http://localhost:7100/ddfs/bulk")
         .json(new_ddfs)
