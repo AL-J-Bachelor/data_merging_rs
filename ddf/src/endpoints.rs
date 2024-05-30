@@ -59,7 +59,7 @@ impl Api {
         Ok(Json(inserted_ddf))
     }
 
-    /// Insert a new DDF
+    /// Insert multiple new DDFs
     #[oai(path = "/ddfs/bulk", method = "put")]
     pub async fn insert_ddfs(&self, pool: Data<&PgPool>, ddfs: Json<Vec<NewDDF>>) -> Result<Json<Vec<DDF>>> {
         let created_ddfs = join_all(
