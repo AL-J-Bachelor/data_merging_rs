@@ -23,10 +23,15 @@ async fn main() -> Result<()> {
 
     let new_ddfs: Vec<NewDDF> = products.iter().map(Product::clone).map(NewDDF::from).collect();
 
-    client.post("http://localhost:7100/ddfs/bulk")
+    let insert_count = client.post("http://localhost:7100/ddfs/bulk")
         .json(&new_ddfs)
         .send()
-        .await?;
+        .await?
+        .text()
+        .await?
+        .parse::<u32>()?;
+
+    println!("Inserted products: {insert_count}");
 
     Ok(())
 }
