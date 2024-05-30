@@ -81,6 +81,7 @@ impl Api {
             r#"
                 INSERT INTO ddfs (device_type, sku_number, manufacturer, model, dce_serial)
                 VALUES ($1, $2, $3, $4, $5)
+                ON CONFLICT DO NOTHING
                 RETURNING id, device_type, sku_number, manufacturer, model, dce_serial
             "#,
             ddf.device_type,
