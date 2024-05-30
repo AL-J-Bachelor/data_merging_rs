@@ -1,12 +1,13 @@
-use poem::error::InternalServerError;
-use poem_openapi::OpenApi;
-use models::ddf::*;
+use futures::future::join_all;
 use poem::{Error, Result};
+use poem::error::InternalServerError;
+use poem::http::StatusCode;
 use poem::web::Data;
+use poem_openapi::OpenApi;
 use poem_openapi::payload::Json;
 use sqlx::PgPool;
-use futures::future::join_all;
-use poem::http::StatusCode;
+
+use models::ddf::*;
 
 pub struct Api;
 
@@ -15,19 +16,17 @@ impl Api {
     /// Get all DDFs that match a given NewDDF
     #[oai(path = "/ddfs/matching", method = "get")]
     pub async fn get_matching_ddfs(&self, pool: Data<&PgPool>, ddf: Json<NewDDF>) -> Result<Json<Vec<DDF>>> {
-        let ddfs = sqlx::query_as!(
-            DDF,
+        let ddfs = sqlx::query_as(
             r#"
-                SELECT id, device_type, sku_number, manufacturer, model, dce_serial FROM ddfs
+                SELECT id, type, sku_number, manufacturer, model, dce_serial FROM ddfs
                 WHERE
-                    device_type = $1 AND
+                    type = $1 AND
                     manufacturer = $2 AND
                     dce_serial = $3
-            "#,
-            ddf.device_type,
-            ddf.manufacturer,
-            ddf.dce_serial,
-        )
+            "#)
+            .bind(&ddf.device_type)
+            .bind(&ddf.manufacturer)
+            .bind(&ddf.dce_serial)
             .fetch_all(pool.0)
             .await
             .map_err(|e| InternalServerError(e))?;
@@ -38,10 +37,9 @@ impl Api {
     /// Get all DDFs
     #[oai(path = "/ddfs", method = "get")]
     pub async fn get_all_ddfs(&self, pool: Data<&PgPool>) -> Result<Json<Vec<DDF>>> {
-        let ddfs = sqlx::query_as!(
-            DDF,
+        let ddfs = sqlx::query_as(
             r#"
-                SELECT id, device_type, sku_number, manufacturer, model, dce_serial FROM ddfs
+                SELECT id, type, sku_number, manufacturer, model, dce_serial FROM ddfs
             "#
         )
             .fetch_all(pool.0)
@@ -52,7 +50,7 @@ impl Api {
     }
 
     /// Insert a new DDF
-    #[oai(path = "/ddfs", method = "post")]
+    #[oai(path = "/ddfs", method = "put")]
     pub async fn insert_ddf(&self, pool: Data<&PgPool>, ddf: Json<NewDDF>) -> Result<Json<DDF>> {
         let inserted_ddf = self.insert_return_ddf(pool.0, &ddf.0)
             .await
@@ -62,7 +60,7 @@ impl Api {
     }
 
     /// Insert a new DDF
-    #[oai(path = "/ddfs/bulk", method = "post")]
+    #[oai(path = "/ddfs/bulk", method = "put")]
     pub async fn insert_ddfs(&self, pool: Data<&PgPool>, ddfs: Json<Vec<NewDDF>>) -> Result<Json<Vec<DDF>>> {
         let created_ddfs = join_all(
             ddfs.iter().map(|ddf| self.insert_return_ddf(pool.0, ddf))
@@ -77,11 +75,10 @@ impl Api {
     /// Delete all DDFs
     #[oai(path = "/ddfs", method = "delete")]
     pub async fn delete_all_ddfs(&self, pool: Data<&PgPool>) -> Result<Json<Vec<DDF>>> {
-        let deleted_ddfs = sqlx::query_as!(
-            DDF,
+        let deleted_ddfs = sqlx::query_as(
             r#"
                 DELETE FROM ddfs
-                RETURNING id, device_type, sku_number, manufacturer, model, dce_serial
+                RETURNING id, type, sku_number, manufacturer, model, dce_serial
             "#
         )
             .fetch_all(pool.0)
@@ -92,20 +89,18 @@ impl Api {
     }
 
     async fn insert_return_ddf(&self, pool: &PgPool, ddf: &NewDDF) -> Result<Option<DDF>, sqlx::Error> {
-        let inserted_ddf = sqlx::query_as!(
-            DDF,
+        let inserted_ddf = sqlx::query_as(
             r#"
-                INSERT INTO ddfs (device_type, sku_number, manufacturer, model, dce_serial)
+                INSERT INTO ddfs (type, sku_number, manufacturer, model, dce_serial)
                 VALUES ($1, $2, $3, $4, $5)
-                ON CONFLICT DO NOTHING
-                RETURNING id, device_type, sku_number, manufacturer, model, dce_serial
-            "#,
-            ddf.device_type,
-            ddf.sku_number,
-            ddf.manufacturer,
-            ddf.model,
-            ddf.dce_serial,
-        )
+                ON CONFLICT ON CONSTRAINT ddfs_sku_number_manufacturer_model_key DO UPDATE SET model = EXCLUDED.model
+                RETURNING id, type, sku_number, manufacturer, model, dce_serial
+            "#)
+            .bind(&ddf.device_type)
+            .bind(&ddf.sku_number)
+            .bind(&ddf.manufacturer)
+            .bind(&ddf.model)
+            .bind(&ddf.dce_serial)
             .fetch_optional(pool)
             .await?;
         Ok(inserted_ddf)

@@ -1,12 +1,15 @@
 use serde::{Deserialize, Serialize};
 use poem_openapi::Object;
+use sqlx::FromRow;
 use crate::pim::Product;
 
 #[derive(Object)]
 #[derive(Serialize, Deserialize)]
+#[derive(FromRow)]
 #[derive(Clone)]
 pub struct DDF {
     pub id: String,
+    #[sqlx(rename = "type")]
     pub device_type: String,
     pub sku_number: Option<String>,
     pub manufacturer: String,
@@ -16,8 +19,10 @@ pub struct DDF {
 
 #[derive(Object)]
 #[derive(Serialize, Deserialize)]
+#[derive(FromRow)]
 #[derive(Clone)]
 pub struct NewDDF {
+    #[sqlx(rename = "type")]
     pub device_type: String,
     pub sku_number: Option<String>,
     pub manufacturer: String,
