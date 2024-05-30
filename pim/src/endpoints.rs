@@ -25,4 +25,21 @@ impl Api {
 
         Ok(Json(products))
     }
+
+    /// Delete all Products
+    #[oai(path = "/products", method = "delete")]
+    pub async fn delete_all_products(&self, pool: Data<&PgPool>) -> Result<Json<Vec<Product>>> {
+        let deleted_products = sqlx::query_as!(
+            Product,
+            r#"
+                DELETE FROM products
+                RETURNING id, sku_number, device_type, manufacturer, model, dce_serial_number, width, height, depth
+            "#
+        )
+            .fetch_all(pool.0)
+            .await
+            .map_err(|e| InternalServerError(e))?;
+
+        Ok(Json(deleted_products))
+    }
 }
