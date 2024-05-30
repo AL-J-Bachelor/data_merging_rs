@@ -1,11 +1,12 @@
 use poem::error::InternalServerError;
 use poem_openapi::OpenApi;
 use models::ddf::*;
-use poem::Result;
+use poem::{Error, Result};
 use poem::web::Data;
 use poem_openapi::payload::Json;
 use sqlx::PgPool;
 use futures::future::join_all;
+use poem::http::StatusCode;
 
 pub struct Api;
 
@@ -55,8 +56,8 @@ impl Api {
     pub async fn insert_ddf(&self, pool: Data<&PgPool>, ddf: Json<NewDDF>) -> Result<Json<DDF>> {
         let inserted_ddf = self.insert_return_ddf(pool.0, &ddf.0)
             .await
-            .unwrap();
-
+            .map_err(|e| InternalServerError(e))?;
+        let inserted_ddf = inserted_ddf.ok_or(Error::from_status(StatusCode::INTERNAL_SERVER_ERROR))?;
         Ok(Json(inserted_ddf))
     }
 
@@ -68,14 +69,29 @@ impl Api {
         )
             .await;
 
-        let created_ddfs: Result<Vec<_>, _> = created_ddfs.into_iter().collect();
+        let created_ddfs = created_ddfs.into_iter().flatten().flatten().collect();
 
-        let created_ddfs: Vec<DDF> = created_ddfs
-            .map_err(|e| InternalServerError(e))?;
         Ok(Json(created_ddfs))
     }
 
-    async fn insert_return_ddf(&self, pool: &PgPool, ddf: &NewDDF) -> Result<DDF, sqlx::Error> {
+    /// Delete all DDFs
+    #[oai(path = "/ddfs", method = "delete")]
+    pub async fn delete_all_ddfs(&self, pool: Data<&PgPool>) -> Result<Json<Vec<DDF>>> {
+        let deleted_ddfs = sqlx::query_as!(
+            DDF,
+            r#"
+                DELETE FROM ddfs
+                RETURNING id, device_type, sku_number, manufacturer, model, dce_serial
+            "#
+        )
+            .fetch_all(pool.0)
+            .await
+            .map_err(|e| InternalServerError(e))?;
+
+        Ok(Json(deleted_ddfs))
+    }
+
+    async fn insert_return_ddf(&self, pool: &PgPool, ddf: &NewDDF) -> Result<Option<DDF>, sqlx::Error> {
         let inserted_ddf = sqlx::query_as!(
             DDF,
             r#"
@@ -90,7 +106,7 @@ impl Api {
             ddf.model,
             ddf.dce_serial,
         )
-            .fetch_one(pool)
+            .fetch_optional(pool)
             .await?;
         Ok(inserted_ddf)
     }
