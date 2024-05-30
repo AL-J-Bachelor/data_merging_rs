@@ -3,7 +3,7 @@ use poem_openapi::OpenApi;
 use models::ddf::*;
 use poem::Result;
 use poem::web::Data;
-use poem_openapi::payload::{Json, PlainText};
+use poem_openapi::payload::Json;
 use sqlx::PgPool;
 use futures::future::join_all;
 
@@ -62,20 +62,20 @@ impl Api {
 
     /// Insert a new DDF
     #[oai(path = "/ddfs/bulk", method = "post")]
-    pub async fn insert_ddfs(&self, pool: Data<&PgPool>, ddfs: Json<Vec<NewDDF>>) -> Result<PlainText<String>> {
+    pub async fn insert_ddfs(&self, pool: Data<&PgPool>, ddfs: Json<Vec<NewDDF>>) -> Result<Json<Vec<DDF>>> {
         let created_ddfs = join_all(
             ddfs.iter().map(|ddf| self.insert_return_ddf(pool.0, ddf))
         )
             .await;
 
-        let created_count = created_ddfs.iter()
-            .filter(|ddf| ddf.is_ok())
-            .count();
+        let created_ddfs: Result<Vec<_>, _> = created_ddfs.into_iter().collect();
 
-        Ok(PlainText(created_count.to_string()))
+        let created_ddfs: Vec<DDF> = created_ddfs
+            .map_err(|e| InternalServerError(e))?;
+        Ok(Json(created_ddfs))
     }
 
-    async fn insert_return_ddf(&self, pool: &PgPool, ddf: &NewDDF) -> color_eyre::Result<DDF> {
+    async fn insert_return_ddf(&self, pool: &PgPool, ddf: &NewDDF) -> Result<DDF, sqlx::Error> {
         let inserted_ddf = sqlx::query_as!(
             DDF,
             r#"
