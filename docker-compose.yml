@@ -1,0 +1,65 @@
+services:
+  ddf_db:
+    image: postgres
+    container_name: ddf_database
+    ports:
+      - 5432:5432
+    volumes:
+      - ddf-storage:/var/lib/postgresql/data
+      - ./ddf/db_init:/docker-entrypoint-initdb.d/
+    environment:
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_USER=admin
+      - POSTGRES_DB=ddf
+    networks:
+      - my-network
+  gps_db:
+    image: postgres
+    container_name: gps_database
+    ports:
+      - 5433:5432
+    volumes:
+      - gps-storage:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_USER=admin
+      - POSTGRES_DB=gps
+    networks:
+      - my-network
+  pim_db:
+    image: postgres
+    container_name: pim_database
+    ports:
+      - 5434:5432
+    volumes:
+      - pim-storage:/var/lib/postgresql/data
+      - ./pim/db_init:/docker-entrypoint-initdb.d/
+    environment:
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_USER=admin
+      - POSTGRES_DB=pim
+    networks:
+      - my-network
+  ddf_server:
+    build: ./ddf
+    depends_on:
+      - ddf_db
+  gps_server:
+    build: ./gps
+    depends_on:
+      - gps_db
+  pim_server:
+    build: ./pim
+    depends_on:
+      - pim_db
+
+
+volumes:
+  
+  ddf-storage: {}
+  gps-storage: {}
+  pim-storage: {}
+
+networks:
+  my-network:
+    external: false
