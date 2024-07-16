@@ -12,9 +12,11 @@ use poem_openapi::OpenApiService;
 async fn main() -> Result<()> {
     color_eyre::install()?;
 
-    let pool = PgPool::connect(&env::var("DATABASE_URL")?).await?;
+    let db_url = &env::var("DATABASE_URL")?;
+    println!("Connecting to database at {}", db_url);
+    let pool = PgPool::connect(db_url).await?;
 
-    let url = env::var("HOST_URL")?;
+    let host_url = env::var("HOST_URL")?;
 
     let api_service =
         OpenApiService::new(Api, "GPS Service", env!("CARGO_PKG_VERSION"))
@@ -28,8 +30,8 @@ async fn main() -> Result<()> {
         .with(AddData::new(pool))
         .with(Cors::new());
 
-    println!("Running server on {url}");
-    Server::new(TcpListener::bind(url))
+    println!("Running server on {host_url}");
+    Server::new(TcpListener::bind(host_url))
         .run(app)
         .await?;
 

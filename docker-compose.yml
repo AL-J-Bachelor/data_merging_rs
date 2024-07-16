@@ -41,21 +41,50 @@ services:
     networks:
       - my-network
   ddf_server:
-    build: ./ddf
+    build:
+      context: ./
+      dockerfile: Dockerfile-ddf
+    environment:
+      DATABASE_URL: "postgresql://admin:admin@ddf_db/ddf"
+      HOST_URL: "0.0.0.0:7100"
+      DOCUMENTATION_TARGET_URL: "http://localhost:7100"
+    ports:
+      - 7100:7100
     depends_on:
       - ddf_db
+    networks:
+      - my-network
   gps_server:
-    build: ./gps
+    build:
+      context: ./
+      dockerfile: Dockerfile-gps
+    environment:
+      DATABASE_URL: "postgresql://admin:admin@gps_db/gps"
+      HOST_URL: "0.0.0.0:7100"
+      DOCUMENTATION_TARGET_URL: "http://localhost:7100"
+    ports:
+      - 7200:7100
     depends_on:
       - gps_db
+    networks:
+      - my-network
   pim_server:
-    build: ./pim
+    build:
+      context: ./
+      dockerfile: Dockerfile-pim
+    environment:
+      DATABASE_URL: "postgresql://admin:admin@pim_db/pim"
+      HOST_URL: "0.0.0.0:7100"
+      DOCUMENTATION_TARGET_URL: "http://localhost:7100"
+    ports:
+      - 7300:7100
     depends_on:
       - pim_db
+    networks:
+      - my-network
 
 
 volumes:
-  
   ddf-storage: {}
   gps-storage: {}
   pim-storage: {}

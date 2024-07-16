@@ -1,17 +1,20 @@
 FROM lukemathwalker/cargo-chef:latest AS chef
-WORKDIR /pim
 LABEL authors="jakob753951"
 
+WORKDIR /pim
+
 FROM chef AS planner
-COPY . .
+COPY models/ /models/
+COPY pim .
 RUN cargo chef prepare --recipe-path recipe.json
 
 FROM chef AS builder
 COPY --from=planner /pim/recipe.json recipe.json
+COPY models/ /models/
 # Build dependencies - this is the caching Docker layer!
 RUN cargo chef cook --release --recipe-path recipe.json
 # Build application
-COPY . .
+COPY pim .
 RUN cargo build --release --bin pim
 
 # We do not need the Rust toolchain to run the binary!
