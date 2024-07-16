@@ -61,7 +61,7 @@ services:
     environment:
       DATABASE_URL: "postgresql://admin:admin@gps_db/gps"
       HOST_URL: "0.0.0.0:7100"
-      DOCUMENTATION_TARGET_URL: "http://localhost:7100"
+      DOCUMENTATION_TARGET_URL: "http://localhost:7200"
     ports:
       - 7200:7100
     depends_on:
@@ -75,14 +75,13 @@ services:
     environment:
       DATABASE_URL: "postgresql://admin:admin@pim_db/pim"
       HOST_URL: "0.0.0.0:7100"
-      DOCUMENTATION_TARGET_URL: "http://localhost:7100"
+      DOCUMENTATION_TARGET_URL: "http://localhost:7300"
     ports:
       - 7300:7100
     depends_on:
       - pim_db
     networks:
       - my-network
-
 
 volumes:
   ddf-storage: {}
