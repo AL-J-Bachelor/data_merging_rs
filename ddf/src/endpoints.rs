@@ -40,8 +40,7 @@ impl Api {
         let ddfs = sqlx::query_as(
             r#"
                 SELECT id, type, sku_number, manufacturer, model, dce_serial FROM ddfs
-            "#
-        )
+            "#)
             .fetch_all(pool.0)
             .await
             .map_err(|e| InternalServerError(e))?;
