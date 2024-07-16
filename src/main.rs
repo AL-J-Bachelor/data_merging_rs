@@ -1,16 +1,15 @@
+use color_eyre::Result;
+use reqwest;
+
 use models::ddf::*;
 use models::gps::*;
 use models::pim::*;
-use color_eyre::Result;
-use reqwest;
 
 #[tokio::main]
 async fn main() -> Result<()> {
     color_eyre::install()?;
 
     let client = reqwest::Client::new();
-
-
 
     let products_url = "http://localhost:7300/products";
     let products = client.get(products_url)
