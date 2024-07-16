@@ -30,7 +30,7 @@ async fn main() -> Result<()> {
         .json::<Vec<DDF>>()
         .await?;
 
-    println!("Inserted products: {}", inserted_ddfs.len());
+    println!("Inserted DDFs: {}", inserted_ddfs.len());
 
     Ok(())
 }
