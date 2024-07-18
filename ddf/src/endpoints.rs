@@ -4,7 +4,7 @@ use poem::error::InternalServerError;
 use poem::http::StatusCode;
 use poem::web::Data;
 use poem_openapi::OpenApi;
-use poem_openapi::payload::Json;
+use poem_openapi::payload::{Json, PlainText};
 use sqlx::PgPool;
 
 use models::ddf::*;
@@ -13,6 +13,12 @@ pub struct Api;
 
 #[OpenApi]
 impl Api {
+    /// Ping
+    #[oai(path = "/ping", method = "get")]
+    pub async fn ping(&self) -> PlainText<&str> {
+        PlainText("OK")
+    }
+
     /// Get all DDFs that match a given NewDDF
     #[oai(path = "/ddfs/matching", method = "get")]
     pub async fn get_matching_ddfs(&self, pool: Data<&PgPool>, ddf: Json<NewDDF>) -> Result<Json<Vec<DDF>>> {

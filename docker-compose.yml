@@ -44,6 +44,7 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile-ddf
+    container_name: ddf_server
     environment:
       DATABASE_URL: "postgresql://admin:admin@ddf_db/ddf"
       HOST_URL: "0.0.0.0:7100"
@@ -58,6 +59,7 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile-gps
+    container_name: gps_server
     environment:
       DATABASE_URL: "postgresql://admin:admin@gps_db/gps"
       HOST_URL: "0.0.0.0:7100"
@@ -72,6 +74,7 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile-pim
+    container_name: pim_server
     environment:
       DATABASE_URL: "postgresql://admin:admin@pim_db/pim"
       HOST_URL: "0.0.0.0:7100"
@@ -80,6 +83,26 @@ services:
       - 7300:7100
     depends_on:
       - pim_db
+    networks:
+      - my-network
+  sync_tool_server:
+    build:
+      context: ./
+      dockerfile: Dockerfile-sync_tool
+    container_name: data_sync_server
+    environment:
+      HOST_URL: "0.0.0.0:7100"
+      DOCUMENTATION_TARGET_URL: "http://localhost:7400"
+
+      DDF_BASE_URL: "http://localhost:7100"
+      GPS_BASE_URL: "http://localhost:7200"
+      PIM_BASE_URL: "http://localhost:7300"
+    ports:
+      - 7400:7100
+    depends_on:
+      - ddf_server
+      - gps_server
+      - pim_server
     networks:
       - my-network
 

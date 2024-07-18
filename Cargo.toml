@@ -1,4 +1,4 @@
-workspace = { members = ["ddf", "gps", "models", "pim"] }
+workspace = { members = ["ddf", "gps", "models", "pim", "sync_tool"] }
 [package]
 name = "data_merging_rs"
 version = "0.1.0"
