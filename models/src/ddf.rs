@@ -20,7 +20,9 @@ pub struct DDF {
 #[derive(Object)]
 #[derive(Serialize, Deserialize)]
 #[derive(FromRow)]
+#[derive(PartialEq, Eq)]
 #[derive(Clone)]
+#[derive(Debug)]
 pub struct NewDDF {
     #[sqlx(rename = "type")]
     pub device_type: String,
@@ -39,5 +41,69 @@ impl From<Product> for NewDDF {
             model: product.model,
             dce_serial: product.dce_serial_number,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::ddf::NewDDF;
+    use crate::pim::{Dimensions, Product};
+
+    #[test]
+    fn full_product_yields_full_ddf() {
+        let full_product = Product {
+            id: 0,
+            sku_number: "123".to_string(),
+            device_type: "456".to_string(),
+            manufacturer: "789".to_string(),
+            model: Some("012".to_string()),
+            dce_serial_number: "345".to_string(),
+            dimensions: Dimensions {
+                width: 1.2,
+                height: 3.4,
+                depth: 5.6,
+            },
+        };
+
+        let actual: NewDDF = full_product.into();
+
+        let expected = NewDDF {
+            sku_number: Some("123".to_string()),
+            device_type: "456".to_string(),
+            manufacturer: "789".to_string(),
+            model: Some("012".to_string()),
+            dce_serial: "345".to_string(),
+        };
+
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn product_with_empty_model_yields_ddf_with_empty_model() {
+        let full_product = Product {
+            id: 0,
+            sku_number: "123".to_string(),
+            device_type: "456".to_string(),
+            manufacturer: "789".to_string(),
+            model: None,
+            dce_serial_number: "345".to_string(),
+            dimensions: Dimensions {
+                width: 1.2,
+                height: 3.4,
+                depth: 5.6,
+            },
+        };
+
+        let actual: NewDDF = full_product.into();
+
+        let expected = NewDDF {
+            sku_number: Some("123".to_string()),
+            device_type: "456".to_string(),
+            manufacturer: "789".to_string(),
+            model: None,
+            dce_serial: "345".to_string(),
+        };
+
+        assert_eq!(actual, expected);
     }
 }
