@@ -21,8 +21,6 @@ impl Api {
     /// Synchronize services
     #[oai(path = "/sync", method = "post")]
     pub async fn sync(&self, urls: Data<&Urls>) -> Result<PlainText<String>> {
-        println!("Processing sync");
-
         let urls = urls.0;
 
         let client = reqwest::Client::new();
@@ -36,7 +34,7 @@ impl Api {
             .await
             .map_err(InternalServerError)?;
 
-        println!("Retrieved products: {}", products.len());
+        println!("Retrieved {} products", products.len());
 
         let new_ddfs: Vec<NewDDF> = products.iter().map(Product::clone).map(NewDDF::from).collect();
         let ddf_creation_url = format!("{}/ddfs/bulk", urls.ddf_base_url);
@@ -49,8 +47,8 @@ impl Api {
             .await
             .map_err(InternalServerError)?;
 
-        println!("Inserted products: {}", inserted_ddfs.len());
+        println!("Inserted {} DDFs", inserted_ddfs.len());
 
-        Ok(PlainText("".to_string()))
+        Ok(PlainText(format!("Synced {} products/DDFs", inserted_ddfs.len())))
     }
 }
