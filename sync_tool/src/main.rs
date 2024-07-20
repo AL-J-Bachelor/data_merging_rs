@@ -26,6 +26,18 @@ async fn main() -> Result<()> {
         pim_base_url: env::var("PIM_BASE_URL")?,
     };
 
+    let client = reqwest::Client::new();
+    for url in vec![&urls.ddf_base_url, &urls.gps_base_url, &urls.pim_base_url] {
+        let url = format!("{}/ping", url);
+        let response_text = client
+            .get(url)
+            .send()
+            .await?
+            .text()
+            .await?;
+        assert_eq!(response_text, "OK");
+    }
+
     let api_service =
         OpenApiService::new(Api, "Data Sync Service", env!("CARGO_PKG_VERSION"))
             .server(env::var("DOCUMENTATION_TARGET_URL")?);
