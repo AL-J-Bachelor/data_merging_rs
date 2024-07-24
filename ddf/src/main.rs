@@ -1,19 +1,21 @@
-mod endpoints;
+use std::env;
 
+use color_eyre::Result;
 use poem::{EndpointExt, listener::TcpListener, Route, Server};
 use poem::middleware::{AddData, Cors};
-use endpoints::Api;
-use std::env;
-use sqlx::PgPool;
-use color_eyre::Result;
 use poem_openapi::OpenApiService;
+use sqlx::PgPool;
+
+use endpoints::Api;
+
+mod endpoints;
 
 #[tokio::main]
 async fn main() -> Result<()> {
     color_eyre::install()?;
 
     let db_url = &env::var("DATABASE_URL")?;
-    println!("Connecting to database at {}", db_url);
+    println!("Connecting to database at {db_url}");
     let pool = PgPool::connect(db_url).await?;
 
     let host_url = env::var("HOST_URL")?;

@@ -1,9 +1,10 @@
 use poem::error::InternalServerError;
-use poem::web::Data;
 use poem::Result;
+use poem::web::Data;
 use poem_openapi::OpenApi;
 use poem_openapi::payload::{Json, PlainText};
 use sqlx::PgPool;
+
 use models::pim::{NewProduct, Product};
 
 pub struct Api;
@@ -11,6 +12,7 @@ pub struct Api;
 #[OpenApi]
 impl Api {
     /// Ping
+    #[allow(clippy::unused_async)]
     #[oai(path = "/ping", method = "get")]
     pub async fn ping(&self) -> PlainText<&str> {
         PlainText("OK")
@@ -20,9 +22,9 @@ impl Api {
     #[oai(path = "/products", method = "get")]
     pub async fn get_products(&self, pool: Data<&PgPool>) -> Result<Json<Vec<Product>>> {
         let products = sqlx::query_as(
-            r#"
+            r"
                 SELECT id, sku_number, type, manufacturer, model, dce_serial_number, width, height, depth FROM products
-            "#
+            "
         )
             .fetch_all(pool.0)
             .await
@@ -35,12 +37,12 @@ impl Api {
     #[oai(path = "/products", method = "put")]
     pub async fn create_product(&self, pool: Data<&PgPool>, product: Json<NewProduct>) -> Result<Json<Vec<Product>>> {
         let products = sqlx::query_as(
-            r#"
+            r"
                 INSERT INTO products (sku_number, type, manufacturer, model, dce_serial_number, width, height, depth)
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
                 ON CONFLICT ON CONSTRAINT products_sku_number_manufacturer_model_key DO UPDATE SET model = EXCLUDED.model
                 RETURNING id, sku_number, type, manufacturer, model, dce_serial_number, width, height, depth
-            "#)
+            ")
             .bind(&product.sku_number)
             .bind(&product.device_type)
             .bind(&product.manufacturer)
@@ -60,10 +62,10 @@ impl Api {
     #[oai(path = "/products", method = "delete")]
     pub async fn delete_all_products(&self, pool: Data<&PgPool>) -> Result<Json<Vec<Product>>> {
         let deleted_products = sqlx::query_as(
-            r#"
+            r"
                 DELETE FROM products
                 RETURNING id, sku_number, type, manufacturer, model, dce_serial_number, width, height, depth
-            "#
+            "
         )
             .fetch_all(pool.0)
             .await

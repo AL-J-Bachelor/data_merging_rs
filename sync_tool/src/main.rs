@@ -9,9 +9,9 @@ use poem_openapi::OpenApiService;
 
 #[derive(Clone)]
 struct Urls {
-    ddf_base_url: String,
-    gps_base_url: String,
-    pim_base_url: String,
+    ddf: String,
+    gps: String,
+    pim: String,
 }
 
 #[tokio::main]
@@ -21,14 +21,14 @@ async fn main() -> Result<()> {
     let host_url = env::var("HOST_URL")?;
 
     let urls = Urls {
-        ddf_base_url: env::var("DDF_BASE_URL")?,
-        gps_base_url: env::var("GPS_BASE_URL")?,
-        pim_base_url: env::var("PIM_BASE_URL")?,
+        ddf: env::var("DDF_BASE_URL")?,
+        gps: env::var("GPS_BASE_URL")?,
+        pim: env::var("PIM_BASE_URL")?,
     };
 
     let client = reqwest::Client::new();
-    for url in [&urls.ddf_base_url, &urls.gps_base_url, &urls.pim_base_url] {
-        let url = format!("{}/ping", url);
+    for url in [&urls.ddf, &urls.gps, &urls.pim] {
+        let url = format!("{url}/ping");
         let response_text = client
             .get(url)
             .send()

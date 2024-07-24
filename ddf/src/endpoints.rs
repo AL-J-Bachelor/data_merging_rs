@@ -7,13 +7,14 @@ use poem_openapi::OpenApi;
 use poem_openapi::payload::{Json, PlainText};
 use sqlx::PgPool;
 
-use models::ddf::*;
+use models::ddf::{DDF, NewDDF};
 
 pub struct Api;
 
 #[OpenApi]
 impl Api {
     /// Ping
+    #[allow(clippy::unused_async)]
     #[oai(path = "/ping", method = "get")]
     pub async fn ping(&self) -> PlainText<&str> {
         PlainText("OK")
@@ -23,13 +24,13 @@ impl Api {
     #[oai(path = "/ddfs/matching", method = "get")]
     pub async fn get_matching_ddfs(&self, pool: Data<&PgPool>, ddf: Json<NewDDF>) -> Result<Json<Vec<DDF>>> {
         let ddfs = sqlx::query_as(
-            r#"
+            r"
                 SELECT id, type, sku_number, manufacturer, model, dce_serial FROM ddfs
                 WHERE
                     type = $1 AND
                     manufacturer = $2 AND
                     dce_serial = $3
-            "#)
+            ")
             .bind(&ddf.device_type)
             .bind(&ddf.manufacturer)
             .bind(&ddf.dce_serial)
@@ -44,9 +45,9 @@ impl Api {
     #[oai(path = "/ddfs", method = "get")]
     pub async fn get_all_ddfs(&self, pool: Data<&PgPool>) -> Result<Json<Vec<DDF>>> {
         let ddfs = sqlx::query_as(
-            r#"
+            r"
                 SELECT id, type, sku_number, manufacturer, model, dce_serial FROM ddfs
-            "#)
+            ")
             .fetch_all(pool.0)
             .await
             .map_err(InternalServerError)?;
@@ -81,10 +82,10 @@ impl Api {
     #[oai(path = "/ddfs", method = "delete")]
     pub async fn delete_all_ddfs(&self, pool: Data<&PgPool>) -> Result<Json<Vec<DDF>>> {
         let deleted_ddfs = sqlx::query_as(
-            r#"
+            r"
                 DELETE FROM ddfs
                 RETURNING id, type, sku_number, manufacturer, model, dce_serial
-            "#
+            "
         )
             .fetch_all(pool.0)
             .await
@@ -95,12 +96,12 @@ impl Api {
 
     async fn insert_return_ddf(&self, pool: &PgPool, ddf: &NewDDF) -> Result<Option<DDF>, sqlx::Error> {
         let inserted_ddf = sqlx::query_as(
-            r#"
+            r"
                 INSERT INTO ddfs (type, sku_number, manufacturer, model, dce_serial)
                 VALUES ($1, $2, $3, $4, $5)
                 ON CONFLICT ON CONSTRAINT ddfs_sku_number_manufacturer_model_key DO UPDATE SET model = EXCLUDED.model
                 RETURNING id, type, sku_number, manufacturer, model, dce_serial
-            "#)
+            ")
             .bind(&ddf.device_type)
             .bind(&ddf.sku_number)
             .bind(&ddf.manufacturer)

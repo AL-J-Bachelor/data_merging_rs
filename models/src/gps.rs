@@ -1,5 +1,5 @@
-use serde::{Deserialize, Serialize};
 use poem_openapi::Object;
+use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 
 #[derive(Object)]
@@ -27,8 +27,8 @@ struct GenomeProperty {
     uuid: String,
     property_definition_uuid: String,
     unit: Option<String>,
-    #[sqlx(rename="type")]
-    _type: String,
+    #[sqlx(rename = "type")]
+    genome_type: String,
     string_values: Vec<String>,
 }
 
@@ -38,7 +38,8 @@ struct Genome {
     uuid: String,
     gxbd_id: Option<String>,
     label: String,
-    genome_type_uuid: String,
+    #[sqlx(rename = "genome_type_uuid")]
+    type_uuid: String,
     state: String,
     create_date: u64,
     update_date: u64,
