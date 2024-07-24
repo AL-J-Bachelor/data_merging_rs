@@ -34,6 +34,7 @@ struct GenomeProperty {
 
 #[derive(Object)]
 #[derive(Serialize, Deserialize)]
+#[derive(FromRow)]
 struct Genome {
     uuid: String,
     gxbd_id: Option<String>,
