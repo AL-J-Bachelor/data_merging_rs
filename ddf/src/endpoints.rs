@@ -35,7 +35,7 @@ impl Api {
             .bind(&ddf.dce_serial)
             .fetch_all(pool.0)
             .await
-            .map_err(|e| InternalServerError(e))?;
+            .map_err(InternalServerError)?;
 
         Ok(Json(ddfs))
     }
@@ -49,7 +49,7 @@ impl Api {
             "#)
             .fetch_all(pool.0)
             .await
-            .map_err(|e| InternalServerError(e))?;
+            .map_err(InternalServerError)?;
 
         Ok(Json(ddfs))
     }
@@ -59,7 +59,7 @@ impl Api {
     pub async fn insert_ddf(&self, pool: Data<&PgPool>, ddf: Json<NewDDF>) -> Result<Json<DDF>> {
         let inserted_ddf = self.insert_return_ddf(pool.0, &ddf.0)
             .await
-            .map_err(|e| InternalServerError(e))?;
+            .map_err(InternalServerError)?;
         let inserted_ddf = inserted_ddf.ok_or(Error::from_status(StatusCode::INTERNAL_SERVER_ERROR))?;
         Ok(Json(inserted_ddf))
     }
@@ -88,7 +88,7 @@ impl Api {
         )
             .fetch_all(pool.0)
             .await
-            .map_err(|e| InternalServerError(e))?;
+            .map_err(InternalServerError)?;
 
         Ok(Json(deleted_ddfs))
     }

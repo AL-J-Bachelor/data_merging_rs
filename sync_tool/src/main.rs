@@ -27,7 +27,7 @@ async fn main() -> Result<()> {
     };
 
     let client = reqwest::Client::new();
-    for url in vec![&urls.ddf_base_url, &urls.gps_base_url, &urls.pim_base_url] {
+    for url in [&urls.ddf_base_url, &urls.gps_base_url, &urls.pim_base_url] {
         let url = format!("{}/ping", url);
         let response_text = client
             .get(url)

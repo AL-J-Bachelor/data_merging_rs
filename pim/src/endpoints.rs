@@ -26,7 +26,7 @@ impl Api {
         )
             .fetch_all(pool.0)
             .await
-            .map_err(|e| InternalServerError(e))?;
+            .map_err(InternalServerError)?;
 
         Ok(Json(products))
     }
@@ -46,12 +46,12 @@ impl Api {
             .bind(&product.manufacturer)
             .bind(&product.model)
             .bind(&product.dce_serial_number)
-            .bind(&product.dimensions.width)
-            .bind(&product.dimensions.height)
-            .bind(&product.dimensions.depth)
+            .bind(product.dimensions.width)
+            .bind(product.dimensions.height)
+            .bind(product.dimensions.depth)
             .fetch_all(pool.0)
             .await
-            .map_err(|e| InternalServerError(e))?;
+            .map_err(InternalServerError)?;
 
         Ok(Json(products))
     }
@@ -67,7 +67,7 @@ impl Api {
         )
             .fetch_all(pool.0)
             .await
-            .map_err(|e| InternalServerError(e))?;
+            .map_err(InternalServerError)?;
 
         Ok(Json(deleted_products))
     }
