@@ -399,16 +399,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "data_merging_rs"
-version = "0.1.0"
-dependencies = [
- "color-eyre",
- "models",
- "reqwest",
- "tokio",
-]
-
-[[package]]
 name = "ddf"
 version = "0.1.0"
 dependencies = [
