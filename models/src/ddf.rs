@@ -106,4 +106,19 @@ mod tests {
 
         assert_eq!(actual, expected);
     }
+
+    #[test]
+    fn random_products_yields_correct_ddfs() {
+        for _ in 0..100 {
+            let product = Product::generate_random();
+
+            let actual: NewDDF = product.clone().into();
+
+            assert_eq!(product.sku_number, actual.sku_number.unwrap());
+            assert_eq!(product.device_type, actual.device_type);
+            assert_eq!(product.manufacturer, actual.manufacturer);
+            assert_eq!(product.model, actual.model);
+            assert_eq!(product.dce_serial_number, actual.dce_serial);
+        }
+    }
 }

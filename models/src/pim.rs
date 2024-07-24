@@ -1,12 +1,14 @@
 use poem_openapi::Object;
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
+use rand_derive2::RandGen;
 
 
 #[derive(Object)]
 #[derive(Serialize, Deserialize)]
 #[derive(FromRow)]
 #[derive(Clone)]
+#[derive(RandGen)]
 pub struct Product {
     pub id: i32,
     pub sku_number: String,
@@ -40,6 +42,7 @@ pub type Millimeters = f64;
 #[derive(Serialize, Deserialize)]
 #[derive(FromRow)]
 #[derive(Clone)]
+#[derive(RandGen)]
 pub struct Dimensions {
     pub width: Millimeters,
     pub height: Millimeters,
