@@ -41,7 +41,7 @@ impl Api {
 
         let new_ddfs: Vec<NewDDF> = products.iter().map(Product::clone).map(NewDDF::from).collect();
         let ddf_creation_url = format!("{}/ddfs/bulk", urls.ddf);
-        let inserted_ddfs = client.put(ddf_creation_url)
+        let inserted_ddfs = client.post(ddf_creation_url)
             .json(&new_ddfs)
             .send()
             .await

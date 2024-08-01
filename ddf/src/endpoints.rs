@@ -56,7 +56,7 @@ impl Api {
     }
 
     /// Insert a new DDF
-    #[oai(path = "/ddfs", method = "put")]
+    #[oai(path = "/ddfs", method = "post")]
     pub async fn insert_ddf(&self, pool: Data<&PgPool>, ddf: Json<NewDDF>) -> Result<Json<DDF>> {
         let inserted_ddf = self.insert_return_ddf(pool.0, &ddf.0)
             .await
@@ -66,7 +66,7 @@ impl Api {
     }
 
     /// Insert multiple new DDFs
-    #[oai(path = "/ddfs/bulk", method = "put")]
+    #[oai(path = "/ddfs/bulk", method = "post")]
     pub async fn insert_ddfs(&self, pool: Data<&PgPool>, ddfs: Json<Vec<NewDDF>>) -> Json<Vec<DDF>> {
         let created_ddfs = join_all(
             ddfs.iter().map(|ddf| self.insert_return_ddf(pool.0, ddf))

@@ -34,7 +34,7 @@ impl Api {
     }
 
     /// Insert product
-    #[oai(path = "/products", method = "put")]
+    #[oai(path = "/products", method = "post")]
     pub async fn create_product(&self, pool: Data<&PgPool>, product: Json<NewProduct>) -> Result<Json<Vec<Product>>> {
         let products = sqlx::query_as(
             r"
