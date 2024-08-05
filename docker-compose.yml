@@ -85,11 +85,11 @@ services:
       - pim_db
     networks:
       - my-network
-  sync_tool_server:
+  sync_server:
     build:
       context: ./
-      dockerfile: Dockerfile_sync_tool
-    container_name: data_sync_server
+      dockerfile: Dockerfile_sync
+    container_name: sync_server
     environment:
       HOST_URL: "0.0.0.0:7100"
       DOCUMENTATION_TARGET_URL: "http://localhost:7400"

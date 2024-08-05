@@ -1,7 +1,7 @@
 [workspace]
 
 members = [
-    "sync_tool",
+    "sync",
     "models",
     "ddf",
     "gps",

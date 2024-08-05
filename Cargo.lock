@@ -2348,7 +2348,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "sync_tool"
+name = "sync"
 version = "0.1.0"
 dependencies = [
  "color-eyre",
