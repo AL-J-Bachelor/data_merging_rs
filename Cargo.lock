@@ -407,8 +407,6 @@ dependencies = [
  "models",
  "poem",
  "poem-openapi",
- "serde",
- "serde_json",
  "sqlx",
  "tokio",
 ]
@@ -714,11 +712,8 @@ name = "gps"
 version = "0.1.0"
 dependencies = [
  "color-eyre",
- "models",
  "poem",
  "poem-openapi",
- "serde",
- "serde_json",
  "sqlx",
  "tokio",
 ]
@@ -1148,7 +1143,6 @@ dependencies = [
  "rand",
  "rand_derive2",
  "serde",
- "serde_json",
  "sqlx",
 ]
 
@@ -1396,7 +1390,6 @@ dependencies = [
  "poem",
  "poem-openapi",
  "serde",
- "serde_json",
  "sqlx",
  "tokio",
 ]
@@ -2337,8 +2330,6 @@ dependencies = [
  "poem",
  "poem-openapi",
  "reqwest",
- "serde",
- "serde_json",
  "tokio",
 ]
 

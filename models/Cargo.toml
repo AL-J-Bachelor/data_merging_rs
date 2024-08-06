@@ -6,9 +6,8 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-sqlx = { version = "~0.7", features = ["postgres", "runtime-tokio", "uuid", "macros"] }
-poem-openapi = { version = "~5.0", features = ["swagger-ui", "openapi-explorer"] }
+sqlx = { version = "~0.7", features = ["macros"] }
+poem-openapi = "~5.0"
 serde = { version = "~1.0", features = ["derive"] }
-serde_json = "~1.0"
 rand_derive2 = "0.1"
 rand = "0.8"
