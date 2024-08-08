@@ -14,7 +14,7 @@ services:
     networks:
       - my-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      test: ["CMD-SHELL", "pg_isready -U admin -d ddf"]
       interval: 10s
       retries: 5
       start_period: 30s
@@ -33,7 +33,7 @@ services:
     networks:
       - my-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      test: ["CMD-SHELL", "pg_isready -U admin -d gps"]
       interval: 10s
       retries: 5
       start_period: 30s
@@ -53,7 +53,7 @@ services:
     networks:
       - my-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      test: ["CMD-SHELL", "pg_isready -U admin -d pim"]
       interval: 10s
       retries: 5
       start_period: 30s
