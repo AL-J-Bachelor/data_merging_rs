@@ -21,4 +21,12 @@ RUN cargo build --release --bin gps
 FROM debian:bookworm AS runtime
 WORKDIR /gps
 COPY --from=builder /gps/target/release/gps /usr/local/bin
+
+RUN apt-get update
+RUN apt-get install -y curl
+RUN apt clean
+RUN rm -rf /var/lib/apt/lists/*
+
+HEALTHCHECK --start-period=30s --retries=5 --interval=10s --timeout=10s \
+    CMD curl --fail http://localhost:7100/ping || exit 1
 ENTRYPOINT ["/usr/local/bin/gps"]

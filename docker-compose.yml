@@ -13,6 +13,12 @@ services:
       - POSTGRES_DB=ddf
     networks:
       - my-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d ddf"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
   gps_db:
     image: postgres
     container_name: gps_database
@@ -26,6 +32,12 @@ services:
       - POSTGRES_DB=gps
     networks:
       - my-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d gps"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
   pim_db:
     image: postgres
     container_name: pim_database
@@ -40,6 +52,12 @@ services:
       - POSTGRES_DB=pim
     networks:
       - my-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d pim"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
   ddf_server:
     build:
       context: ./
@@ -52,7 +70,8 @@ services:
     ports:
       - 7100:7100
     depends_on:
-      - ddf_db
+      ddf_db:
+        condition: service_healthy
     networks:
       - my-network
   gps_server:
@@ -67,7 +86,8 @@ services:
     ports:
       - 7200:7100
     depends_on:
-      - gps_db
+      gps_db:
+        condition: service_healthy
     networks:
       - my-network
   pim_server:
@@ -82,7 +102,8 @@ services:
     ports:
       - 7300:7100
     depends_on:
-      - pim_db
+      pim_db:
+        condition: service_healthy
     networks:
       - my-network
   sync_server:
@@ -100,9 +121,12 @@ services:
     ports:
       - 7400:7100
     depends_on:
-      - ddf_server
-      - gps_server
-      - pim_server
+      ddf_server:
+        condition: service_healthy
+      gps_server:
+        condition: service_healthy
+      pim_server:
+        condition: service_healthy
     networks:
       - my-network
 
