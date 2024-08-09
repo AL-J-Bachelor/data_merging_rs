@@ -121,9 +121,12 @@ services:
     ports:
       - 7400:7100
     depends_on:
-      - ddf_server
-      - gps_server
-      - pim_server
+      ddf_server:
+        condition: service_healthy
+      gps_server:
+        condition: service_healthy
+      pim_server:
+        condition: service_healthy
     networks:
       - my-network
 
