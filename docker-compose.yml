@@ -11,8 +11,6 @@ services:
       - POSTGRES_PASSWORD=admin
       - POSTGRES_USER=admin
       - POSTGRES_DB=ddf
-    networks:
-      - my-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U admin -d ddf"]
       interval: 10s
@@ -30,8 +28,6 @@ services:
       - POSTGRES_PASSWORD=admin
       - POSTGRES_USER=admin
       - POSTGRES_DB=gps
-    networks:
-      - my-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U admin -d gps"]
       interval: 10s
@@ -50,8 +46,6 @@ services:
       - POSTGRES_PASSWORD=admin
       - POSTGRES_USER=admin
       - POSTGRES_DB=pim
-    networks:
-      - my-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U admin -d pim"]
       interval: 10s
@@ -72,8 +66,6 @@ services:
     depends_on:
       ddf_db:
         condition: service_healthy
-    networks:
-      - my-network
   gps_server:
     build:
       context: ./
@@ -88,8 +80,6 @@ services:
     depends_on:
       gps_db:
         condition: service_healthy
-    networks:
-      - my-network
   pim_server:
     build:
       context: ./
@@ -104,8 +94,6 @@ services:
     depends_on:
       pim_db:
         condition: service_healthy
-    networks:
-      - my-network
   sync_server:
     build:
       context: ./
@@ -127,8 +115,6 @@ services:
         condition: service_healthy
       pim_server:
         condition: service_healthy
-    networks:
-      - my-network
 
 volumes:
   ddf-storage: {}
@@ -136,5 +122,4 @@ volumes:
   pim-storage: {}
 
 networks:
-  my-network:
-    external: false
+  default:
