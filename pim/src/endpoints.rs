@@ -41,8 +41,8 @@ impl Api {
 
     /// Insert product
     #[oai(path = "/products", method = "post")]
-    pub async fn create_product(&self, pool: Data<&PgPool>, product: Json<NewProduct>) -> Result<Json<Vec<Product>>> {
-        let products = sqlx::query_as(
+    pub async fn create_product(&self, pool: Data<&PgPool>, product: Json<NewProduct>) -> Result<Json<Product>> {
+        let product = sqlx::query_as(
             r"
                 INSERT INTO products (sku_number, type, manufacturer, model, dce_serial_number, width, height, depth)
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
@@ -57,11 +57,11 @@ impl Api {
             .bind(product.dimensions.width)
             .bind(product.dimensions.height)
             .bind(product.dimensions.depth)
-            .fetch_all(pool.0)
+            .fetch_one(pool.0)
             .await
             .map_err(InternalServerError)?;
 
-        Ok(Json(products))
+        Ok(Json(product))
     }
 
     /// Insert product
